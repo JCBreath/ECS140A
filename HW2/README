@@ -1,1 +1,68 @@
+Siyuan Yao, 913199781, jimyao@ucdavis.edu, ysiyuan
+Kai Yan, 913001154, kaiyan@ucdavis.edu, kyan2015
 
+
+Comments:
+I think everything works well here. 
+The scoping was a bit tricky, but I solved it by giving the layer number to the variables.
+e.g. 
+x_1bbbb represents the global level.
+x_10bbbb represents the bbbb on the 10th layer
+After I implement the check scoping function, I find out that I have to find the closed variable for a call that does not have '~' at front.
+
+For the structure of Symbol Table, I used List + Stack as the instructor suggested. The list was implemented by arrayList, which is simple and efficient.
+I noticed I can actually get a value from any element in the Stack without poping any elements. That is convenient.
+
+
+PART 5
+
+program ::= block
+block ::= declaration_list statement_list
+declaration_list ::= {declaration}
+statement_list ::= {statement}
+
+declaration ::= ’@’ id { ’,’ id }
+
+statement ::= assignment | print | do | if | for
+print ::= ’!’ expr
+assignment ::= ref_id ’=’ expr
+ref_id ::= [ ’ ̃’ [ number ] ] id
+
+for ::= ('^' | '_') ref_id ':' number ':' block ?
+do ::= ’<’ guarded_command ’>’
+if ::= ’[’ guarded_command { ’|’ guarded_command } [ ’%’ block ] ’]’
+guarded_command ::= expr ’:’ block
+
+expr ::= term { addop term }
+term ::= factor { multop factor }
+factor ::= ’(’ expr ’)’ | ref_id | number
+addop ::= ’+’ | ’-’
+multop ::= ’*’ | ’/
+
+
+Translation:
+	'^' = increment
+		E:
+			for ::= '^' ref_id ':' number ':' block ?
+		C/C++:
+			for(; ref_id <= number; ref_id++) { block }
+
+	'_' = decrement
+		E:
+			for ::= '_' ref_id ':' number ':' block ?
+		C/C++:
+			for(; ref_id >= number; ref_id--) { block }
+
+This form basically will increment/decrement a designated variable, which could be used within loop.
+I use ref_id because we can use variable in specific level of scoping.
+Number is where the variable will reach. And, if the variable does not satisfy the condition required, the whole for loop will be skipped.
+This primarily works well as a for loop.
+
+
+New test files:
+t50.e:
+	check for{for{}} situation
+t51.e:
+	check error response (scoping)
+t52.e:
+	check scoping correctness
